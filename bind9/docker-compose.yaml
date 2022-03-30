@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  dns:
+    image: internetsystemsconsortium/bind9:9.18
+    container_name: dns
+    ports:
+      - "1053:53/udp"
+    volumes:
+      - ./named.conf.local:/etc/bind/named.conf.local
+      - ./named.conf.options:/etc/bind/named.conf.options
+      - ./named.conf:/etc/bind/named.conf
+      - ./exemple.conf:/etc/bind/zone.exemple.com
+      - ./reverse.conf:/etc/bind/zone.reverse
+    networks:
+      cours_net:
+        ipv4_address: 172.28.0.5
+    restart: always
+
+networks:
+  cours_net:
+    external: true
+    name: cours-network
+

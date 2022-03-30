@@ -1,0 +1,19 @@
+//___________________________________________________
+// ZONE DE RESOLUTION DE DOMAINE exemple.com         |
+//___________________________________________________|
+
+zone "exemple.com" {
+        type master;
+        file "/etc/bind/zone.exemple.com";
+        notify yes; 
+};
+
+//____________________________
+// ZONE DE RESOLUTION INVERSE |
+//____________________________|
+
+zone "10.20.172.in-addr.arpa" {
+        type master;
+        file "/etc/bind/zone.reverse";
+        notify no;
+};

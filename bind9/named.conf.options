@@ -1,0 +1,17 @@
+acl internals { any; };
+options{
+        auth-nxdomain no;
+        listen-on { any; };
+        allow-transfer { none; };
+        allow-query { internals; };
+        allow-recursion { internals; };
+        dnssec-validation auto;
+        listen-on tls ephemeral http local { any; };
+        listen-on tls ephemeral { any; };
+        listen-on { any; };
+        directory "/var/cache/bind";
+};
+
+http local {
+    endpoints { "/dns-query"; };
+};
