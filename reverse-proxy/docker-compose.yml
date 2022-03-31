@@ -1,15 +1,21 @@
 version: '3.9'
 services:
   nginx_frontend:
-    image: nginx:latest
+    image: nginx
     container_name: nginx-front
     networks:
       cours_net:
         ipv4_address: 172.28.0.2
-
+    ports:
+      - "80:80"
+    volumes:
+      - ./code/nginx.conf:/etc/nginx/nginx.conf:rw
+    links:
+      - nginx_backend
+      - icinga2
 
   nginx_backend:
-    image: nginx:latest
+    image: nginx
     container_name: nginx-back
     networks:
       cours_net:
@@ -17,10 +23,10 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./code:/code
-      - ./site.conf:/etc/nginx/conf.d/default.conf
+      - ./site:/code
+      - ./site/site.conf:/etc/nginx/conf.d/default.conf:rw
     links:
-      - php
+      - php-fpm
   
   php-fpm:
     image: php:7-fpm
@@ -29,4 +35,9 @@ services:
       cours_net:
         ipv4_address: 172.28.0.4
     volumes:
-    - ./code:/code
+      - ./site:/code
+
+networks:
+  cours_net:
+    external: true
+    name: cours-network
