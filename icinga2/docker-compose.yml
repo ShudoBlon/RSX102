@@ -5,26 +5,16 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    restart: on-failure
-    # Set your hostname to the FQDN under which your
-    # sattelites will reach this container
+    restart: unless-stopped
     hostname: icinga2
     container_name: icinga2
     env_file:
       - secrets_sql.env
     environment:
       - ICINGA2_FEATURE_GRAPHITE=1
-      # Important:
-      # keep the hostname graphite the same as
-      # the name of the graphite docker-container
       - ICINGA2_FEATURE_GRAPHITE_HOST=graphite
       - ICINGA2_FEATURE_GRAPHITE_PORT=2003
       - ICINGA2_FEATURE_GRAPHITE_URL=http://graphite
-      # - ICINGA2_FEATURE_GRAPHITE_SEND_THRESHOLDS=true
-      # - ICINGA2_FEATURE_GRAPHITE_SEND_METADATA=false
-      #- ICINGAWEB2_ADMIN_USER=icingaadmin
-      #- ICINGAWEB2_ADMIN_PASS=icinga
-      #- ICINGA2_USER_FULLNAME=Icinga2 Docker Monitoring Instance
       - DEFAULT_MYSQL_HOST=mysql
     volumes:
       - ./data/icinga/cache:/var/cache/icinga2
@@ -38,21 +28,13 @@ services:
       - ./data/icinga/log/icingaweb2:/var/log/icingaweb2
       - ./data/icinga/log/mysql:/var/log/mysql
       - ./data/icinga/spool:/var/spool/icinga2
-      # Sending e-mail
-      #  See: https://github.com/jjethwa/icinga2#sending-notification-mails
-      #  If you want to enable outbound e-mail, edit the file mstmp/msmtprc
-      #  and configure to your corresponding mail setup. The default is a
-      #  Gmail example but msmtp can be used for any MTA configuration.
-      #  Change the aliases in msmtp/aliases to your recipients.
-      #  Then uncomment the rows below
-      # - ./msmtp/msmtprc:/etc/msmtprc:ro
-      # - ./msmtp/aliases:/etc/aliases:ro
     ports:
       - "8085:80"
       - "30443:443"
       - "5665:5665"
     networks:
       cours_net:
+        ipv4_address: 172.28.0.6
 
   graphite:
     image: graphiteapp/graphite-statsd:latest
@@ -66,6 +48,7 @@ services:
       - ./data/graphite/log/carbon:/var/log/carbon
     networks:
       cours_net:
+        ipv4_address: 172.28.0.7
 
   mysql:
     image: mariadb
@@ -74,13 +57,11 @@ services:
       - secrets_sql.env
     volumes:
       - ./data/mysql/data:/var/lib/mysql
-      # If you have previously used the container's internal DB use:
-      #- ./data/icinga/lib/mysql:/var/lib/mysql
     networks:
       cours_net:
+        ipv4_address: 172.28.0.8
 
 networks:
   cours_net:
     external: true
     name: cours-network
-
